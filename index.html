@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Калькулятор Kaspi QR</title>
+  <title>Расходы и цена Kaspi QR</title>
   <style>
     :root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#17221f;background:#f3f6f4;font-synthesis:none}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:32px 18px;background:radial-gradient(ellipse at 15% 0%,#e4f1e9,transparent 45%),#f3f6f4}
@@ -22,51 +22,59 @@
 </head>
 <body>
 <main>
-  <div class="eyebrow">Kaspi QR · калькулятор</div>
-  <h1>Сколько останется с продажи?</h1>
-  <p class="intro">Меняйте значения — расчёт обновляется сразу.</p>
+  <div class="eyebrow">Kaspi QR · калькулятор цены</div>
+  <h1>Сначала расходы, потом цена</h1>
+  <p class="intro">Введите себестоимость и вес. Калькулятор покажет расходы и рекомендуемую цену до публикации товара.</p>
   <section class="layout">
     <div class="card">
-      <h2>Данные заказа</h2>
+      <h2>Ваши данные</h2>
       <div class="field"><label for="count">Количество товаров</label><div class="input-wrap"><input id="count" type="number" min="1" step="1" value="1"><span class="unit">шт.</span></div></div>
       <div class="field"><label for="cost">Себестоимость одной штуки</label><div class="input-wrap"><input id="cost" type="number" min="0" step="any" value="1000"><span class="unit">₸ / шт.</span></div></div>
-      <div class="field"><label for="shipping">Ваша доставка за одну штуку</label><div class="input-wrap"><input id="shipping" type="number" min="0" step="any" value="0"><span class="unit">₸ / шт.</span></div></div>
-      <div class="field"><label for="price">Цена продажи одной штуки</label><div class="input-wrap"><input id="price" type="number" min="0" step="any" value="3000"><span class="unit">₸ / шт.</span></div></div>
+      <div class="field"><label for="weight">Вес одной штуки</label><div class="input-wrap"><input id="weight" type="number" min="0" step="any" value="0.5"><span class="unit">кг</span></div></div>
+      <div class="field"><label for="rateKg">Тариф вашей доставки</label><div class="input-wrap"><input id="rateKg" type="number" min="0" step="any" value="1743"><span class="unit">₸ / кг</span></div></div>
+      <div class="field"><label for="commissionRate">Комиссия Kaspi QR</label><div class="input-wrap"><input id="commissionRate" type="number" min="0" max="100" step="any" value="0.95"><span class="unit">%</span></div></div>
+      <div class="field"><label for="margin">Желаемая чистая прибыль на расходы</label><div class="input-wrap"><input id="margin" type="number" min="0" step="any" value="50"><span class="unit">%</span></div></div>
       <button class="reset" id="reset" type="button">Сбросить значения</button>
     </div>
     <div class="card result" aria-live="polite">
-      <div><h2>Ваш результат</h2><div class="profit" id="profit">—</div><div class="profit-label">чистый доход за весь заказ</div></div>
+      <div><h2>Рекомендуемая цена</h2><div class="profit" id="suggested">—</div><div class="profit-label">за одну штуку — ориентир для выставления</div></div>
       <div class="rows">
-        <div class="row"><span>Выручка</span><strong id="revenue">—</strong></div>
-        <div class="row"><span>Себестоимость</span><strong id="costTotal">—</strong></div>
-        <div class="row"><span>Ваша доставка</span><strong id="shippingTotal">—</strong></div>
-        <div class="row"><span>Комиссия Kaspi QR (0,95%)</span><strong id="commission">—</strong></div>
+        <div class="row"><span>Себестоимость заказа</span><strong id="costTotal">—</strong></div>
+        <div class="row"><span>Вес всего заказа</span><strong id="weightTotal">—</strong></div>
+        <div class="row"><span>Ваша доставка по весу</span><strong id="shippingTotal">—</strong></div>
+        <div class="row"><span>Расходы до продажи</span><strong id="expenses">—</strong></div>
+        <div class="row"><span>Расходы на одну штуку</span><strong id="perItemCost">—</strong></div>
+        <div class="row"><span>Комиссия Kaspi QR</span><strong id="commission">—</strong></div>
         <div class="row"><span>Налог (4%)</span><strong id="tax">—</strong></div>
-        <div class="row"><span>Доставка Kaspi</span><strong id="kaspiDelivery">—</strong></div>
-        <div class="row"><span>Чистый доход с одной штуки</span><strong id="perItem">—</strong></div>
+        <div class="row"><span>Доставка Kaspi на заказ</span><strong id="kaspiDelivery">—</strong></div>
+        <div class="row"><span>Чистая прибыль на заказ</span><strong id="profit">—</strong></div>
       </div>
-      <div class="note">Комиссия и налог рассчитаны по ставкам из вашей таблицы. Тариф доставки Kaspi применяется к каждой штуке.</div>
+      <div class="note">Рекомендация учитывает расходы, указанную комиссию, налог 4% и тариф доставки Kaspi из таблицы. Тариф вашей доставки считается по весу.</div>
     </div>
   </section>
 </main>
 <script>
-  const fields=['count','cost','shipping','price'];
+  const fields=['count','cost','weight','rateKg','commissionRate','margin'];
   const fmt=n=>`${n.toLocaleString('ru-RU',{maximumFractionDigits:2})} ₸`;
   function calculate(){
     const v=Object.fromEntries(fields.map(id=>[id,Number(document.getElementById(id).value)]));
-    const {count,cost,shipping,price}=v;
-    if(!Number.isFinite(count)||count<1||!Number.isInteger(count)||![cost,shipping,price].every(n=>Number.isFinite(n)&&n>=0)){
-      document.getElementById('profit').textContent='Проверьте ввод'; return;
+    const {count,cost,weight,rateKg,commissionRate,margin}=v;
+    if(!Number.isFinite(count)||count<1||!Number.isInteger(count)||![cost,weight,rateKg,commissionRate,margin].every(n=>Number.isFinite(n)&&n>=0)||commissionRate>=100){
+      document.getElementById('suggested').textContent='Проверьте ввод'; return;
     }
-    const revenue=count*price, commission=revenue*.0095, tax=revenue*.04;
-    const fee=price<1000?49:price<=3000?149:price<=5000?199:price<=10000?799:1099;
-    const kaspiDelivery=fee*count, costTotal=cost*count, shippingTotal=shipping*count;
-    const profit=revenue-commission-tax-kaspiDelivery-costTotal-shippingTotal;
-    for(const [id,n] of Object.entries({profit,revenue,costTotal,shippingTotal,commission,tax,kaspiDelivery,perItem:profit/count})) document.getElementById(id).textContent=fmt(n);
+    const costTotal=cost*count, weightTotal=weight*count, shippingTotal=weightTotal*rateKg, expenses=costTotal+shippingTotal;
+    const feeFor=p=>p<1000?49:p<=3000?149:p<=5000?199:p<=10000?799:1099;
+    const takeRate=1-commissionRate/100-.04;
+    let suggested=0;
+    for(let p=1;p<=10000000;p++) if(p*takeRate-feeFor(p)>=expenses/count*(1+margin/100)){suggested=p;break;}
+    if(!suggested){document.getElementById('suggested').textContent='Слишком большие расходы';return;}
+    const revenue=suggested*count, commission=revenue*commissionRate/100, tax=revenue*.04;
+    const kaspiDelivery=feeFor(suggested)*count, profit=revenue-commission-tax-kaspiDelivery-expenses;
+    for(const [id,n] of Object.entries({suggested,revenue,costTotal,weightTotal,shippingTotal,expenses,perItemCost:expenses/count,commission,tax,kaspiDelivery,profit})) document.getElementById(id).textContent=id==='weightTotal'?`${n.toLocaleString('ru-RU',{maximumFractionDigits:3})} кг`:fmt(n);
     document.getElementById('profit').style.color=profit<0?'#ffaaa1':'#8be0b6';
   }
   fields.forEach(id=>document.getElementById(id).addEventListener('input',calculate));
-  document.getElementById('reset').addEventListener('click',()=>{document.getElementById('count').value=1;document.getElementById('cost').value=1000;document.getElementById('shipping').value=0;document.getElementById('price').value=3000;calculate()});
+  document.getElementById('reset').addEventListener('click',()=>{for(const [id,val] of Object.entries({count:1,cost:1000,weight:.5,rateKg:1743,commissionRate:.95,margin:50}))document.getElementById(id).value=val;calculate()});
   calculate();
 </script>
 </body>
