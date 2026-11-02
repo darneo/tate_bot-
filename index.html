@@ -3,79 +3,263 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Расходы и цена Kaspi QR</title>
+  <meta name="theme-color" content="#f7f5f2">
+  <title>Калькулятор прибыли Kaspi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#17221f;background:#f3f6f4;font-synthesis:none}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:32px 18px;background:radial-gradient(ellipse at 15% 0%,#e4f1e9,transparent 45%),#f3f6f4}
-    main{max-width:960px;margin:auto}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:#16835c}
-    h1{font-size:clamp(30px,5vw,48px);letter-spacing:-.04em;margin:9px 0 8px} .intro{margin:0;color:#63716b;font-size:16px}
-    .layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}.card{background:#fff;border:1px solid #e3eae5;border-radius:20px;padding:24px;box-shadow:0 12px 35px #1836290b}
-    h2{font-size:18px;margin:0 0 20px}.field{margin:0 0 17px}.field:last-child{margin-bottom:0}label{font-size:13px;font-weight:650;display:block;margin-bottom:7px;color:#42514a}
-    .input-wrap{display:flex;align-items:center;border:1px solid #dbe4de;border-radius:11px;background:#fbfcfb;transition:.15s}.input-wrap:focus-within{border-color:#15966a;box-shadow:0 0 0 3px #15966a1c}
-    input{width:100%;border:0;outline:0;background:transparent;padding:13px 14px;font:inherit;font-size:16px;color:#17221f} .unit{padding-right:14px;color:#849089;font-size:13px}
-    .result{background:#112c23;color:white;border:0;display:flex;flex-direction:column;justify-content:space-between;min-height:100%}.result h2{color:#dce9e2}
-    .profit{font-size:clamp(38px,6vw,58px);font-weight:760;letter-spacing:-.055em;line-height:1.1;margin:10px 0 6px}.profit-label{color:#b7c9bf;font-size:14px}
-    .rows{margin-top:28px;border-top:1px solid #ffffff24}.row{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #ffffff19;font-size:14px}.row span:first-child{color:#c1d0c8}.row strong{text-align:right;font-weight:650}.note{font-size:12px;color:#84968d;margin-top:15px;line-height:1.5}
-    .reset{border:0;border-radius:10px;background:#e8f2ec;color:#176443;padding:11px 14px;font:inherit;font-weight:650;cursor:pointer;margin-top:20px}.reset:hover{background:#d7eadf}
-    @media(max-width:700px){body{padding:24px 14px}.layout{grid-template-columns:1fr}.card{padding:20px}.result{min-height:370px}}
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f5f2;
+      --card: #ffffff;
+      --text: #20201f;
+      --muted: #77736e;
+      --border: #e8e3dc;
+      --accent: #e31e3a;
+      --input: #fff2c2;
+      --input-border: #f0d883;
+      --green: #167447;
+      --green-bg: #e5f5ec;
+      --red: #b42336;
+      --red-bg: #fde9ec;
+      --shadow: 0 8px 28px rgb(47 37 22 / 5%);
+      --focus: #245fe8;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151515; --card: #20201f; --text: #f4f1ed; --muted: #aaa49c;
+        --border: #393633; --input: #3b321b; --input-border: #76622b;
+        --green: #7fe0a9; --green-bg: #173b29; --red: #ff9aa7; --red-bg: #481f28;
+        --shadow: 0 8px 28px rgb(0 0 0 / 20%); --focus: #91b3ff;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Onest, system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+    main { width: min(100% - 28px, 560px); margin: 0 auto; padding: 26px 0 44px; }
+    header { margin: 0 0 20px; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+    h1 { margin: 5px 0 0; font-size: 27px; line-height: 1.17; letter-spacing: -.04em; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); }
+    .inputs { padding: 16px; }
+    .field { display: block; margin: 0 0 11px; }
+    .field:last-child { margin-bottom: 0; }
+    .field span { display: block; margin: 0 0 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .field input { display: block; width: 100%; height: 49px; padding: 8px 13px; border: 1px solid var(--input-border); border-radius: 11px; outline: none; background: var(--input); color: var(--text); text-align: right; font: 700 19px/1 Onest, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+    .field.primary input { height: 60px; font-size: 26px; }
+    input:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: -.02em; }
+    .results { margin-top: 14px; }
+    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tile { min-width: 0; padding: 14px 13px 15px; border: 1px solid var(--border); border-radius: 16px; background: var(--card); }
+    .tile.main { border-color: transparent; }
+    .tile.positive { background: var(--green-bg); color: var(--green); }
+    .tile.negative { background: var(--red-bg); color: var(--red); }
+    .tile-label { min-height: 34px; font-size: 12px; line-height: 1.35; font-weight: 650; }
+    .tile-number { margin-top: 5px; font-size: clamp(21px, 6vw, 29px); line-height: 1.1; font-weight: 800; letter-spacing: -.045em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .breakdown { margin-top: 14px; padding: 16px 13px 10px; overflow: hidden; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+    th, td { padding: 9px 5px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; white-space: normal; }
+    thead th { color: var(--muted); font-size: 10px; font-weight: 700; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .strong-row td { font-weight: 800; }
+    .good { color: var(--green); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+    .minimum { margin-top: 14px; padding: 16px; }
+    .min-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .min-cell { padding: 11px 12px; border-radius: 11px; background: var(--bg); }
+    .min-label { color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .min-value { margin-top: 4px; color: var(--text); font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    details { margin-top: 14px; padding: 0 16px; }
+    summary { padding: 15px 0; cursor: pointer; font-size: 14px; font-weight: 700; }
+    .settings { padding: 0 0 16px; }
+    .setting-input { margin-bottom: 11px; }
+    .setting-input label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .setting-input input { width: 100%; height: 44px; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: 10px; background: var(--input); color: var(--text); text-align: right; font: 650 16px Onest, system-ui, sans-serif; }
+    .reset { min-height: 42px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--accent); font: 700 13px Onest, system-ui, sans-serif; cursor: pointer; }
+    .tariffs { margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .footnote { margin: 12px 2px 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    @media (min-width: 600px) { main { padding-top: 38px; } h1 { font-size: 31px; } .inputs { padding: 20px; } .field { margin-bottom: 13px; } }
   </style>
 </head>
 <body>
-<main>
-  <div class="eyebrow">Kaspi QR · калькулятор цены</div>
-  <h1>Сначала расходы, потом цена</h1>
-  <p class="intro">Введите себестоимость и вес. Калькулятор покажет расходы и рекомендуемую цену до публикации товара.</p>
-  <section class="layout">
-    <div class="card">
-      <h2>Ваши данные</h2>
-      <div class="field"><label for="count">Количество товаров</label><div class="input-wrap"><input id="count" type="number" min="1" step="1" value="1"><span class="unit">шт.</span></div></div>
-      <div class="field"><label for="cost">Себестоимость одной штуки</label><div class="input-wrap"><input id="cost" type="number" min="0" step="any" value="1000"><span class="unit">₸ / шт.</span></div></div>
-      <div class="field"><label for="weight">Вес одной штуки</label><div class="input-wrap"><input id="weight" type="number" min="0" step="any" value="0.5"><span class="unit">кг</span></div></div>
-      <div class="field"><label for="rateKg">Тариф вашей доставки</label><div class="input-wrap"><input id="rateKg" type="number" min="0" step="any" value="1743"><span class="unit">₸ / кг</span></div></div>
-      <div class="field"><label for="commissionRate">Комиссия Kaspi QR</label><div class="input-wrap"><input id="commissionRate" type="number" min="0" max="100" step="any" value="0.95"><span class="unit">%</span></div></div>
-      <div class="field"><label for="margin">Желаемая чистая прибыль на расходы</label><div class="input-wrap"><input id="margin" type="number" min="0" step="any" value="50"><span class="unit">%</span></div></div>
-      <button class="reset" id="reset" type="button">Сбросить значения</button>
-    </div>
-    <div class="card result" aria-live="polite">
-      <div><h2>Рекомендуемая цена</h2><div class="profit" id="suggested">—</div><div class="profit-label">за одну штуку — ориентир для выставления</div></div>
-      <div class="rows">
-        <div class="row"><span>Себестоимость заказа</span><strong id="costTotal">—</strong></div>
-        <div class="row"><span>Вес всего заказа</span><strong id="weightTotal">—</strong></div>
-        <div class="row"><span>Ваша доставка по весу</span><strong id="shippingTotal">—</strong></div>
-        <div class="row"><span>Расходы до продажи</span><strong id="expenses">—</strong></div>
-        <div class="row"><span>Расходы на одну штуку</span><strong id="perItemCost">—</strong></div>
-        <div class="row"><span>Комиссия Kaspi QR</span><strong id="commission">—</strong></div>
-        <div class="row"><span>Налог (4%)</span><strong id="tax">—</strong></div>
-        <div class="row"><span>Доставка Kaspi на заказ</span><strong id="kaspiDelivery">—</strong></div>
-        <div class="row"><span>Чистая прибыль на заказ</span><strong id="profit">—</strong></div>
+  <main>
+    <header><div class="eyebrow">Kaspi · калькулятор продавца</div><h1>Расчёт чистого дохода</h1></header>
+    <section class="card inputs" aria-label="Исходные данные">
+      <label class="field primary"><span>Цена продажи, ₸</span><input id="sale" type="text" inputmode="decimal" autocomplete="off" value="1000" aria-label="Цена продажи в тенге"></label>
+      <label class="field"><span>Цена закупки за шт., ₸</span><input id="purchase" type="text" inputmode="decimal" autocomplete="off" value="339" aria-label="Цена закупки за штуку в тенге"></label>
+      <label class="field"><span>Штук в партии</span><input id="quantity" type="text" inputmode="decimal" autocomplete="off" value="35" aria-label="Количество штук в партии"></label>
+      <label class="field"><span>Цена веса на всю партию, ₸</span><input id="weightCost" type="text" inputmode="decimal" autocomplete="off" value="200" aria-label="Цена веса на всю партию в тенге"></label>
+      <label class="field"><span>Комиссия Kaspi, %</span><input id="commissionRate" type="text" inputmode="decimal" autocomplete="off" value="12,5" aria-label="Комиссия Kaspi в процентах"></label>
+    </section>
+
+    <section class="results" aria-live="polite">
+      <div class="tiles">
+        <article id="tileReserve" class="tile main positive"><div class="tile-label">Чистый доход с шт.<br>расход +50%</div><div class="tile-number" id="tileReserveValue">—</div></article>
+        <article id="tilePlain" class="tile positive"><div class="tile-label">Чистый доход с шт.<br>расход без запаса</div><div class="tile-number" id="tilePlainValue">—</div></article>
       </div>
-      <div class="note">Рекомендация учитывает расходы, указанную комиссию, налог 4% и тариф доставки Kaspi из таблицы. Тариф вашей доставки считается по весу.</div>
-    </div>
-  </section>
-</main>
-<script>
-  const fields=['count','cost','weight','rateKg','commissionRate','margin'];
-  const fmt=n=>`${n.toLocaleString('ru-RU',{maximumFractionDigits:2})} ₸`;
-  function calculate(){
-    const v=Object.fromEntries(fields.map(id=>[id,Number(document.getElementById(id).value)]));
-    const {count,cost,weight,rateKg,commissionRate,margin}=v;
-    if(!Number.isFinite(count)||count<1||!Number.isInteger(count)||![cost,weight,rateKg,commissionRate,margin].every(n=>Number.isFinite(n)&&n>=0)||commissionRate>=100){
-      document.getElementById('suggested').textContent='Проверьте ввод'; return;
+      <section class="card breakdown">
+        <h2>Разбор по шагам</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th></th><th>Без запаса</th><th id="reserveHeading">Запас +50%</th></tr></thead>
+          <tbody>
+            <tr><td>Цена продажи</td><td id="plainSale">—</td><td id="reserveSale">—</td></tr>
+            <tr><td>Комиссия Kaspi</td><td id="plainCommission">—</td><td id="reserveCommission">—</td></tr>
+            <tr><td>Налог</td><td id="plainTax">—</td><td id="reserveTax">—</td></tr>
+            <tr><td>Доставка</td><td id="plainDelivery">—</td><td id="reserveDelivery">—</td></tr>
+            <tr><td>Расход на шт.</td><td id="plainUnitCost">—</td><td id="reserveUnitCost">—</td></tr>
+            <tr class="strong-row"><td>Чистый доход с шт.</td><td id="plainNet">—</td><td id="reserveNet">—</td></tr>
+            <tr class="strong-row"><td>Со всей партии</td><td id="plainTotal">—</td><td id="reserveTotal">—</td></tr>
+            <tr><td>Маржа</td><td id="plainMargin">—</td><td id="reserveMargin">—</td></tr>
+            <tr><td>Общий расход партии</td><td id="plainBatchCost">—</td><td id="reserveBatchCost">—</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="card minimum">
+        <h2>Минимальная цена без убытка</h2>
+        <div class="min-grid">
+          <div class="min-cell"><div class="min-label">Без запаса</div><div class="min-value" id="minPlain">—</div></div>
+          <div class="min-cell"><div class="min-label" id="minReserveLabel">Запас +50%</div><div class="min-value" id="minReserve">—</div></div>
+        </div>
+      </section>
+    </section>
+
+    <details class="card" id="settings">
+      <summary>Настройки и тарифы доставки</summary>
+      <div class="settings">
+        <div class="setting-input"><label for="taxRate">Налог на доход, %</label><input id="taxRate" type="text" inputmode="decimal" value="4" aria-label="Налог на доход в процентах"></div>
+        <div class="setting-input"><label for="reserveRate">Запас на расход, %</label><input id="reserveRate" type="text" inputmode="decimal" value="50" aria-label="Запас на расход в процентах"></div>
+        <button class="reset" id="reset" type="button">Сбросить всё</button>
+        <p class="tariffs">Тариф доставки Kaspi за одну штуку: до 999 ₸ — 49 ₸; от 1 000 до 3 000 ₸ — 149 ₸; от 3 001 до 5 000 ₸ — 199 ₸; от 5 001 до 10 000 ₸ — 799 ₸; выше 10 000 ₸ — 1 099 ₸.</p>
+      </div>
+    </details>
+    <p class="footnote">Расход с запасом включает страховку на возвраты, потери и непредвиденные траты. Все расчёты приведены для одной штуки и всей партии.</p>
+  </main>
+  <script>
+    // Тарифы доставки Kaspi в тенге за одну проданную штуку. Меняйте границы и суммы здесь.
+    const DELIVERY_TARIFFS = [
+      { maxPrice: 999.99, fee: 49 },
+      { maxPrice: 3000, fee: 149 },
+      { maxPrice: 5000, fee: 199 },
+      { maxPrice: 10000, fee: 799 },
+      { maxPrice: Infinity, fee: 1099 }
+    ];
+    const DEFAULTS = { sale: '1000', purchase: '339', quantity: '35', weightCost: '200', commissionRate: '12,5', taxRate: '4', reserveRate: '50' };
+    const INPUT_IDS = Object.keys(DEFAULTS);
+    const numberFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
+    const wholeFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
+
+    // Преобразует точку или запятую в десятичное число; пустое или некорректное значение становится нулём.
+    function readNumber(id) {
+      const normalized = document.getElementById(id).value.trim().replace(/\s/g, '').replace(',', '.');
+      if (normalized === '') return 0;
+      const value = Number(normalized);
+      return Number.isFinite(value) ? value : 0;
     }
-    const costTotal=cost*count, weightTotal=weight*count, shippingTotal=weightTotal*rateKg, expenses=costTotal+shippingTotal;
-    const feeFor=p=>p<1000?49:p<=3000?149:p<=5000?199:p<=10000?799:1099;
-    const takeRate=1-commissionRate/100-.04;
-    let suggested=0;
-    for(let p=1;p<=10000000;p++) if(p*takeRate-feeFor(p)>=expenses/count*(1+margin/100)){suggested=p;break;}
-    if(!suggested){document.getElementById('suggested').textContent='Слишком большие расходы';return;}
-    const revenue=suggested*count, commission=revenue*commissionRate/100, tax=revenue*.04;
-    const kaspiDelivery=feeFor(suggested)*count, profit=revenue-commission-tax-kaspiDelivery-expenses;
-    for(const [id,n] of Object.entries({suggested,revenue,costTotal,weightTotal,shippingTotal,expenses,perItemCost:expenses/count,commission,tax,kaspiDelivery,profit})) document.getElementById(id).textContent=id==='weightTotal'?`${n.toLocaleString('ru-RU',{maximumFractionDigits:3})} кг`:fmt(n);
-    document.getElementById('profit').style.color=profit<0?'#ffaaa1':'#8be0b6';
-  }
-  fields.forEach(id=>document.getElementById(id).addEventListener('input',calculate));
-  document.getElementById('reset').addEventListener('click',()=>{for(const [id,val] of Object.entries({count:1,cost:1000,weight:.5,rateKg:1743,commissionRate:.95,margin:50}))document.getElementById(id).value=val;calculate()});
-  calculate();
-</script>
+    // Форматирует денежное значение с пробелами между разрядами и знаком тенге.
+    function money(value) { return `${numberFormat.format(Number.isFinite(value) ? value : 0)} ₸`; }
+    // Ищет тариф доставки по заданным выше границам цены продажи.
+    function deliveryFee(price) { return DELIVERY_TARIFFS.find(tier => price <= tier.maxPrice).fee; }
+    // Расчёт дохода для одной цены и конкретного расхода на штуку.
+    function unitResult(price, unitCost, commissionPercent, taxPercent) {
+      const commission = price * commissionPercent / 100; // Комиссия = цена продажи × ставка комиссии.
+      const tax = price * taxPercent / 100; // Налог = цена продажи × ставка налога.
+      const delivery = deliveryFee(price); // Тариф Kaspi определяется ценой продажи.
+      const net = price - commission - unitCost - delivery - tax; // Чистый доход = цена минус комиссия, расход, доставка и налог.
+      const margin = price === 0 ? 0 : net / price * 100; // Маржа = чистый доход ÷ цена продажи × 100.
+      return { commission, tax, delivery, net, margin };
+    }
+    // Находит минимальную целую цену перебором, включая ступенчатую доставку.
+    function minimumPrice(unitCost, commissionPercent, taxPercent) {
+      for (let price = 1; price <= 10000000; price += 1) {
+        if (unitResult(price, unitCost, commissionPercent, taxPercent).net >= 0) return price;
+      }
+      return null;
+    }
+    // Добавляет класс цвета для прибыльного или убыточного результата.
+    function colorResult(element, value) {
+      element.classList.toggle('good', value >= 0);
+      element.classList.toggle('bad', value < 0);
+    }
+    // Сохраняет последние введённые данные; недоступность localStorage не мешает расчётам.
+    function saveValues() {
+      try {
+        const values = Object.fromEntries(INPUT_IDS.map(id => [id, document.getElementById(id).value]));
+        localStorage.setItem('kaspiProfitCalculator', JSON.stringify(values));
+      } catch (_) { /* Хранилище может быть отключено браузером или режимом приватного просмотра. */ }
+    }
+    // Загружает последние введённые данные; при ошибке используются значения по умолчанию.
+    function loadValues() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('kaspiProfitCalculator') || '{}');
+        for (const id of INPUT_IDS) if (typeof saved[id] === 'string') document.getElementById(id).value = saved[id];
+      } catch (_) { /* Некорректные или недоступные сохранённые данные игнорируются. */ }
+    }
+    // Обновляет плитки, пошаговую таблицу и минимальные цены при каждом вводе.
+    function calculate() {
+      const sale = Math.max(0, readNumber('sale'));
+      const purchase = Math.max(0, readNumber('purchase'));
+      const quantity = Math.max(0, readNumber('quantity'));
+      const weightCost = Math.max(0, readNumber('weightCost'));
+      const commissionRate = Math.max(0, readNumber('commissionRate'));
+      const taxRate = Math.max(0, readNumber('taxRate'));
+      const reserveRate = Math.max(0, readNumber('reserveRate'));
+      const batchExpense = purchase * quantity + weightCost; // Общий расход партии = закупка за штуку × количество + цена веса всей партии.
+      const reserveBatchExpense = batchExpense * (1 + reserveRate / 100); // Расход с запасом = общий расход × (1 + запас/100).
+      const unitExpense = quantity > 0 ? Math.round(batchExpense / quantity) : 0; // Расход на штуку округляется до целого тенге.
+      const reserveUnitExpense = quantity > 0 ? Math.round(reserveBatchExpense / quantity) : 0; // Расход на штуку с запасом округляется до целого тенге.
+      const plain = unitResult(sale, unitExpense, commissionRate, taxRate);
+      const reserve = unitResult(sale, reserveUnitExpense, commissionRate, taxRate);
+      const reserveHeading = `Запас +${numberFormat.format(reserveRate)}%`;
+      document.getElementById('reserveHeading').textContent = reserveHeading;
+      document.getElementById('minReserveLabel').textContent = reserveHeading;
+      document.querySelector('#tileReserve .tile-label').innerHTML = `Чистый доход с шт.<br>расход +${numberFormat.format(reserveRate)}%`;
+      document.querySelector('#tilePlain .tile-label').innerHTML = 'Чистый доход с шт.<br>расход без запаса';
+      document.getElementById('tileReserveValue').textContent = money(reserve.net);
+      document.getElementById('tilePlainValue').textContent = money(plain.net);
+      document.getElementById('tileReserve').classList.toggle('positive', reserve.net >= 0);
+      document.getElementById('tileReserve').classList.toggle('negative', reserve.net < 0);
+      document.getElementById('tilePlain').classList.toggle('positive', plain.net >= 0);
+      document.getElementById('tilePlain').classList.toggle('negative', plain.net < 0);
+
+      // Для таблицы цены и удержания повторены в обоих столбцах; меняются расход и чистый доход.
+      const values = {
+        plainSale: money(sale), reserveSale: money(sale),
+        plainCommission: money(plain.commission), reserveCommission: money(reserve.commission),
+        plainTax: money(plain.tax), reserveTax: money(reserve.tax),
+        plainDelivery: money(plain.delivery), reserveDelivery: money(reserve.delivery),
+        plainUnitCost: money(unitExpense), reserveUnitCost: money(reserveUnitExpense),
+        plainNet: money(plain.net), reserveNet: money(reserve.net),
+        plainTotal: money(plain.net * quantity), reserveTotal: money(reserve.net * quantity),
+        plainMargin: `${numberFormat.format(plain.margin)}%`, reserveMargin: `${numberFormat.format(reserve.margin)}%`,
+        plainBatchCost: money(batchExpense), reserveBatchCost: money(reserveBatchExpense)
+      };
+      for (const [id, value] of Object.entries(values)) document.getElementById(id).textContent = value;
+      for (const id of ['plainNet','reserveNet','plainTotal','reserveTotal','plainMargin','reserveMargin']) {
+        const source = id.startsWith('plain') ? plain : reserve;
+        colorResult(document.getElementById(id), id.toLowerCase().includes('margin') ? source.margin : source.net);
+      }
+      const minPlain = minimumPrice(unitExpense, commissionRate, taxRate); // Минимальная цена без запаса — первый целый тенге с нулевой или положительной прибылью.
+      const minReserve = minimumPrice(reserveUnitExpense, commissionRate, taxRate); // Минимальная цена с запасом учитывает увеличенный расход.
+      document.getElementById('minPlain').textContent = minPlain === null ? 'не найдено' : money(minPlain);
+      document.getElementById('minReserve').textContent = minReserve === null ? 'не найдено' : money(minReserve);
+      saveValues();
+    }
+
+    loadValues();
+    for (const id of INPUT_IDS) {
+      const input = document.getElementById(id);
+      input.addEventListener('input', calculate);
+      input.addEventListener('focus', () => input.select()); // При фокусе выделяется всё содержимое поля.
+    }
+    document.getElementById('reset').addEventListener('click', () => {
+      for (const [id, value] of Object.entries(DEFAULTS)) document.getElementById(id).value = value;
+      try { localStorage.removeItem('kaspiProfitCalculator'); } catch (_) { /* Сброс полей остаётся рабочим без localStorage. */ }
+      calculate();
+    });
+    calculate();
+  </script>
 </body>
 </html>
