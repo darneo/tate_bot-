@@ -65,6 +65,7 @@
     thead th { color: var(--muted); font-size: 10px; font-weight: 700; }
     tbody tr:last-child td { border-bottom: 0; }
     .strong-row td { font-weight: 800; }
+    .plain-only td:nth-child(3) { visibility: hidden; }
     .good { color: var(--green); font-weight: 700; }
     .bad { color: var(--red); font-weight: 700; }
     .minimum { margin-top: 14px; padding: 16px; }
@@ -110,9 +111,9 @@
             <tr><td>Налог</td><td id="plainTax">—</td><td id="reserveTax">—</td></tr>
             <tr><td>Доставка</td><td id="plainDelivery">—</td><td id="reserveDelivery">—</td></tr>
             <tr><td>Расход на шт.</td><td id="plainUnitCost">—</td><td id="reserveUnitCost">—</td></tr>
-            <tr class="strong-row"><td>Чистый доход с шт.</td><td id="plainNet">—</td><td id="reserveNet">—</td></tr>
-            <tr class="strong-row"><td>Со всей партии</td><td id="plainTotal">—</td><td id="reserveTotal">—</td></tr>
-            <tr><td>Маржа</td><td id="plainMargin">—</td><td id="reserveMargin">—</td></tr>
+            <tr class="strong-row plain-only"><td>Чистый доход с шт.</td><td id="plainNet">—</td><td id="reserveNet" aria-hidden="true">—</td></tr>
+            <tr class="strong-row plain-only"><td>Со всей партии</td><td id="plainTotal">—</td><td id="reserveTotal" aria-hidden="true">—</td></tr>
+            <tr class="plain-only"><td>Маржа</td><td id="plainMargin">—</td><td id="reserveMargin" aria-hidden="true">—</td></tr>
             <tr><td>Общий расход партии</td><td id="plainBatchCost">—</td><td id="reserveBatchCost">—</td></tr>
           </tbody>
         </table></div>
