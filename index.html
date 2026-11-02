@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Калькулятор Kaspi QR</title>
+  <style>
+    :root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#17221f;background:#f3f6f4;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:32px 18px;background:radial-gradient(ellipse at 15% 0%,#e4f1e9,transparent 45%),#f3f6f4}
+    main{max-width:960px;margin:auto}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:#16835c}
+    h1{font-size:clamp(30px,5vw,48px);letter-spacing:-.04em;margin:9px 0 8px} .intro{margin:0;color:#63716b;font-size:16px}
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}.card{background:#fff;border:1px solid #e3eae5;border-radius:20px;padding:24px;box-shadow:0 12px 35px #1836290b}
+    h2{font-size:18px;margin:0 0 20px}.field{margin:0 0 17px}.field:last-child{margin-bottom:0}label{font-size:13px;font-weight:650;display:block;margin-bottom:7px;color:#42514a}
+    .input-wrap{display:flex;align-items:center;border:1px solid #dbe4de;border-radius:11px;background:#fbfcfb;transition:.15s}.input-wrap:focus-within{border-color:#15966a;box-shadow:0 0 0 3px #15966a1c}
+    input{width:100%;border:0;outline:0;background:transparent;padding:13px 14px;font:inherit;font-size:16px;color:#17221f} .unit{padding-right:14px;color:#849089;font-size:13px}
+    .result{background:#112c23;color:white;border:0;display:flex;flex-direction:column;justify-content:space-between;min-height:100%}.result h2{color:#dce9e2}
+    .profit{font-size:clamp(38px,6vw,58px);font-weight:760;letter-spacing:-.055em;line-height:1.1;margin:10px 0 6px}.profit-label{color:#b7c9bf;font-size:14px}
+    .rows{margin-top:28px;border-top:1px solid #ffffff24}.row{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #ffffff19;font-size:14px}.row span:first-child{color:#c1d0c8}.row strong{text-align:right;font-weight:650}.note{font-size:12px;color:#84968d;margin-top:15px;line-height:1.5}
+    .reset{border:0;border-radius:10px;background:#e8f2ec;color:#176443;padding:11px 14px;font:inherit;font-weight:650;cursor:pointer;margin-top:20px}.reset:hover{background:#d7eadf}
+    @media(max-width:700px){body{padding:24px 14px}.layout{grid-template-columns:1fr}.card{padding:20px}.result{min-height:370px}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Kaspi QR · калькулятор</div>
+  <h1>Сколько останется с продажи?</h1>
+  <p class="intro">Меняйте значения — расчёт обновляется сразу.</p>
+  <section class="layout">
+    <div class="card">
+      <h2>Данные заказа</h2>
+      <div class="field"><label for="count">Количество товаров</label><div class="input-wrap"><input id="count" type="number" min="1" step="1" value="1"><span class="unit">шт.</span></div></div>
+      <div class="field"><label for="cost">Себестоимость одной штуки</label><div class="input-wrap"><input id="cost" type="number" min="0" step="any" value="1000"><span class="unit">₸ / шт.</span></div></div>
+      <div class="field"><label for="shipping">Ваша доставка за одну штуку</label><div class="input-wrap"><input id="shipping" type="number" min="0" step="any" value="0"><span class="unit">₸ / шт.</span></div></div>
+      <div class="field"><label for="price">Цена продажи одной штуки</label><div class="input-wrap"><input id="price" type="number" min="0" step="any" value="3000"><span class="unit">₸ / шт.</span></div></div>
+      <button class="reset" id="reset" type="button">Сбросить значения</button>
+    </div>
+    <div class="card result" aria-live="polite">
+      <div><h2>Ваш результат</h2><div class="profit" id="profit">—</div><div class="profit-label">чистый доход за весь заказ</div></div>
+      <div class="rows">
+        <div class="row"><span>Выручка</span><strong id="revenue">—</strong></div>
+        <div class="row"><span>Себестоимость</span><strong id="costTotal">—</strong></div>
+        <div class="row"><span>Ваша доставка</span><strong id="shippingTotal">—</strong></div>
+        <div class="row"><span>Комиссия Kaspi QR (0,95%)</span><strong id="commission">—</strong></div>
+        <div class="row"><span>Налог (4%)</span><strong id="tax">—</strong></div>
+        <div class="row"><span>Доставка Kaspi</span><strong id="kaspiDelivery">—</strong></div>
+        <div class="row"><span>Чистый доход с одной штуки</span><strong id="perItem">—</strong></div>
+      </div>
+      <div class="note">Комиссия и налог рассчитаны по ставкам из вашей таблицы. Тариф доставки Kaspi применяется к каждой штуке.</div>
+    </div>
+  </section>
+</main>
+<script>
+  const fields=['count','cost','shipping','price'];
+  const fmt=n=>`${n.toLocaleString('ru-RU',{maximumFractionDigits:2})} ₸`;
+  function calculate(){
+    const v=Object.fromEntries(fields.map(id=>[id,Number(document.getElementById(id).value)]));
+    const {count,cost,shipping,price}=v;
+    if(!Number.isFinite(count)||count<1||!Number.isInteger(count)||![cost,shipping,price].every(n=>Number.isFinite(n)&&n>=0)){
+      document.getElementById('profit').textContent='Проверьте ввод'; return;
+    }
+    const revenue=count*price, commission=revenue*.0095, tax=revenue*.04;
+    const fee=price<1000?49:price<=3000?149:price<=5000?199:price<=10000?799:1099;
+    const kaspiDelivery=fee*count, costTotal=cost*count, shippingTotal=shipping*count;
+    const profit=revenue-commission-tax-kaspiDelivery-costTotal-shippingTotal;
+    for(const [id,n] of Object.entries({profit,revenue,costTotal,shippingTotal,commission,tax,kaspiDelivery,perItem:profit/count})) document.getElementById(id).textContent=fmt(n);
+    document.getElementById('profit').style.color=profit<0?'#ffaaa1':'#8be0b6';
+  }
+  fields.forEach(id=>document.getElementById(id).addEventListener('input',calculate));
+  document.getElementById('reset').addEventListener('click',()=>{document.getElementById('count').value=1;document.getElementById('cost').value=1000;document.getElementById('shipping').value=0;document.getElementById('price').value=3000;calculate()});
+  calculate();
+</script>
+</body>
+</html>
